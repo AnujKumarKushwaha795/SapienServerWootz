@@ -19,6 +19,7 @@ app.get('/health', (req, res) => {
 // Data endpoints
 app.post('/api/data', (req, res) => {
     try {
+        console.log('Received data:', req.body);
         const receivedData = req.body;
         res.status(200).json({
             message: 'Data received successfully',
