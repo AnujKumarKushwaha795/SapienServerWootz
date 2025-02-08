@@ -2,6 +2,16 @@ const request = require('supertest');
 const app = require('../server');
 
 describe('Server Endpoints', () => {
+    beforeAll(() => {
+        // Silence console.log during tests
+        jest.spyOn(console, 'log').mockImplementation(() => {});
+    });
+
+    afterAll(() => {
+        // Restore console.log after tests
+        jest.restoreAllMocks();
+    });
+
     test('Health check endpoint should return 200', async () => {
         const response = await request(app).get('/health');
         expect(response.status).toBe(200);
