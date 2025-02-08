@@ -8,11 +8,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Add error logging middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
+    console.log('Health check requested');
     res.status(200).json({
         status: 'healthy',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        error: 'Internal Server Error',
+        message: err.message
     });
 });
 
@@ -46,10 +63,15 @@ app.get('/api/data', (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
         console.log('Environment:', process.env.NODE_ENV);
         console.log('Current timestamp:', new Date().toISOString());
+    });
+
+    // Add error handling for the server
+    server.on('error', (error) => {
+        console.error('Server error:', error);
     });
 }
 
